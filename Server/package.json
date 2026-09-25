@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "start": "node src/server.js",
-    "dev": "nodemon src/server.js"
+    "dev": "nodemon src/server.js",
+    "seed:admin": "node src/seed/adminSeed.js"
   },
   "keywords": [],
   "author": "",
@@ -13,6 +14,7 @@
   "description": "",
   "dependencies": {
     "bcryptjs": "^3.0.3",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
     "dotenv": "^18.0.3",
     "express": "^5.2.1",

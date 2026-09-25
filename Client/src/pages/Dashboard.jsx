@@ -29,7 +29,18 @@ const Dashboard = () => {
             role: "admin",
         },
     ]);
+    const fetchUsers = async () => {
+        try {
+            const res = await getUsers()
+            setUsers(res.data.data)
+        } catch (err) {
+            console.log(err);
+        }
+    }
 
+    useEffect(() => {
+        fetchUsers()
+    }, [])
     const handleDeleteUser = (id) => {
         const confirmDelete = window.confirm(
             "Are you sure you want to delete this user?"
@@ -134,11 +145,10 @@ const Dashboard = () => {
 
                                                 <td className="px-6 py-4">
                                                     <span
-                                                        className={`px-3 py-1 rounded-full text-xs font-medium ${
-                                                            item.role === "admin"
+                                                        className={`px-3 py-1 rounded-full text-xs font-medium ${item.role === "admin"
                                                                 ? "bg-purple-100 text-purple-700"
                                                                 : "bg-blue-100 text-blue-700"
-                                                        }`}
+                                                            }`}
                                                     >
                                                         {item.role}
                                                     </span>
@@ -178,7 +188,6 @@ const Dashboard = () => {
                     </>
                 )}
 
-                {/* Normal User Welcome Section */}
                 {!isAdmin && (
                     <div className="bg-white rounded-xl shadow-sm p-8">
                         <h3 className="text-xl font-semibold text-gray-900">

@@ -5,7 +5,7 @@ import { useSelector } from "react-redux";
 
 const Profile = () => {
     const user = useSelector((state) => state.auth.user);
-
+    const isUser=user?.role=='user'
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     const [formData, setFormData] = useState({
@@ -47,10 +47,10 @@ const Profile = () => {
 
             <main className="max-w-3xl mx-auto px-6 py-10">
 
-                {/* Profile Card */}
                 <div className="bg-white rounded-2xl shadow-sm p-8 relative">
+                    {isUser&&(
 
-                    {/* Edit Button */}
+                    
                     <button
                         type="button"
                         onClick={handleEdit}
@@ -59,8 +59,8 @@ const Profile = () => {
                     >
                         ✏️
                     </button>
+                    )}
 
-                    {/* Profile Header */}
                     <div className="text-center">
                         <div className="w-24 h-24 mx-auto rounded-full bg-blue-100 flex items-center justify-center">
                             <span className="text-3xl font-bold text-blue-600">
@@ -73,7 +73,6 @@ const Profile = () => {
                         </h2>
                     </div>
 
-                    {/* User Details */}
                     <div className="border-t border-gray-200 mt-8 pt-8 space-y-5">
 
                         <div>
@@ -107,7 +106,6 @@ const Profile = () => {
                         </div>
                     </div>
 
-                    {/* Back Button */}
                     <Link
                         to="/dashboard"
                         className="block text-center mt-8 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700"
@@ -117,13 +115,11 @@ const Profile = () => {
                 </div>
             </main>
 
-            {/* Edit Modal */}
             {isModalOpen && (
                 <div className="fixed inset-0 bg-black/50 flex items-center justify-center px-4 z-50">
 
                     <div className="bg-white w-full max-w-md rounded-2xl shadow-xl p-6">
 
-                        {/* Modal Header */}
                         <div className="flex items-center justify-between mb-6">
                             <h2 className="text-xl font-bold text-gray-900">
                                 Edit Profile
@@ -138,10 +134,8 @@ const Profile = () => {
                             </button>
                         </div>
 
-                        {/* Form */}
                         <form onSubmit={handleSubmit}>
 
-                            {/* Name */}
                             <div className="mb-4">
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
                                     Full Name
@@ -157,7 +151,6 @@ const Profile = () => {
                                 />
                             </div>
 
-                            {/* Email */}
                             <div className="mb-6">
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
                                     Email
@@ -173,7 +166,6 @@ const Profile = () => {
                                 />
                             </div>
 
-                            {/* Buttons */}
                             <div className="flex gap-3">
 
                                 <button
