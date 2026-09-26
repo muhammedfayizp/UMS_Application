@@ -1,4 +1,5 @@
 import axios from "axios";
+import { store } from "../redux/stoer";
 
 
 const BACK_URL=import.meta.env.VITE_BACKEND_URL

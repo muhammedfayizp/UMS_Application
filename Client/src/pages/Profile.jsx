@@ -1,12 +1,21 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import Navbar from "../components/Navbar";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { valEdit } from "../validation/editVal";
+import { toast } from "react-toastify";
+import { editUser, getUsers } from "../services/userService";
+import { updateUser } from "../redux/slice/authSlice";
 
 const Profile = () => {
+
+    const dispatch = useDispatch()
     const user = useSelector((state) => state.auth.user);
-    const isUser=user?.role=='user'
+    const isUser = user?.role === "user";
+
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [editErr, setEditErr] = useState({});
+    const [loading, setLoading] = useState(false)
 
     const [formData, setFormData] = useState({
         name: user?.name || "",
@@ -18,6 +27,11 @@ const Profile = () => {
             ...formData,
             [e.target.name]: e.target.value,
         });
+
+        setEditErr({
+            ...editErr,
+            [e.target.name]: "",
+        });
     };
 
     const handleEdit = () => {
@@ -26,20 +40,71 @@ const Profile = () => {
             email: user?.email || "",
         });
 
+        setEditErr({});
         setIsModalOpen(true);
     };
 
-    const handleSubmit = (e) => {
+    const fetchUsers = async () => {
+        try {
+            setLoading(true);
+
+            const res = await getUsers();
+
+            setFormData({
+                name: res.data.data.name || "",
+                email: res.data.data.email || "",
+            });
+        } catch (error) {
+            console.error("Failed to fetch users:", error);
+
+            toast.error(
+                error.response?.data?.message || "Failed to fetch users"
+            );
+        } finally {
+            setLoading(false);
+        }
+    };
+    const hasChanges =
+        formData.name !== (user?.name || "") ||
+        formData.email !== (user?.email || "");
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
-        console.log("Updated data:", formData);
+        if (!hasChanges) {
+            return;
+        }
 
-        // Later:
-        // call backend API here
-        // update Redux user here
+        const validEdit = valEdit(formData);
 
-        setIsModalOpen(false);
+        if (Object.keys(validEdit).length > 0) {
+            setEditErr(validEdit);
+            return;
+        }
+
+        try {
+            const res = await editUser(user._id, formData);
+
+            toast.success(
+                res.data.message || "Profile updated successfully"
+            );
+
+            dispatch(updateUser(res.data.data));
+            setIsModalOpen(false);
+
+            setEditErr({});
+
+            fetchUsers();
+
+        } catch (error) {
+            toast.error(
+                error.response?.data?.message ||
+                "Internal server error"
+            );
+        }
     };
+
+
 
     return (
         <div className="min-h-screen bg-gray-100">
@@ -48,17 +113,16 @@ const Profile = () => {
             <main className="max-w-3xl mx-auto px-6 py-10">
 
                 <div className="bg-white rounded-2xl shadow-sm p-8 relative">
-                    {isUser&&(
 
-                    
-                    <button
-                        type="button"
-                        onClick={handleEdit}
-                        className="absolute top-6 right-6 w-10 h-10 rounded-full bg-gray-100 hover:bg-blue-100 flex items-center justify-center text-gray-600 hover:text-blue-600 transition"
-                        title="Edit Profile"
-                    >
-                        ✏️
-                    </button>
+                    {isUser && (
+                        <button
+                            type="button"
+                            onClick={handleEdit}
+                            className="absolute top-6 right-6 w-10 h-10 rounded-full bg-gray-100 hover:bg-blue-100 flex items-center justify-center text-gray-600 hover:text-blue-600 transition"
+                            title="Edit Profile"
+                        >
+                            ✏️
+                        </button>
                     )}
 
                     <div className="text-center">
@@ -149,6 +213,8 @@ const Profile = () => {
                                     className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                     placeholder="Enter your name"
                                 />
+                                {editErr.name && (<p className="text-red-400 text-md">{editErr.name}</p>)}
+
                             </div>
 
                             <div className="mb-6">
@@ -164,6 +230,8 @@ const Profile = () => {
                                     className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                     placeholder="Enter your email"
                                 />
+                                {editErr.email && (<p className="text-red-400 text-md">{editErr.email}</p>)}
+
                             </div>
 
                             <div className="flex gap-3">
@@ -178,7 +246,11 @@ const Profile = () => {
 
                                 <button
                                     type="submit"
-                                    className="flex-1 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700"
+                                    disabled={!hasChanges}
+                                    className={`flex-1 py-3 rounded-lg text-white ${hasChanges
+                                        ? "bg-blue-600 hover:bg-blue-700"
+                                        : "bg-gray-400 cursor-not-allowed"
+                                        }`}
                                 >
                                     Save Changes
                                 </button>

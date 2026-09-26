@@ -27,7 +27,7 @@ const Login = () => {
         }))
     };
 
-    const handleSubmit = async(e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         const ValidErr = vallog(formData)
 
@@ -37,18 +37,17 @@ const Login = () => {
         }
 
         try {
-            const res= await userLogin(formData)
-            console.log(res,'log');
-            
+            const res = await userLogin(formData)
+
             dispatch(loginSuccess({
-                user:res.data.data.existUser,
-                token:res.data.data.accessToken
+                user: res.data.data.existUser,
+                token: res.data.data.accessToken
             }))
-            
-            let role=res.data.data.existUser.role
-            if(role=='admin'){
+
+            let role = res.data.data.existUser.role
+            if (role == 'admin') {
                 navigate('/dashboard')
-            }else{
+            } else {
                 navigate('/profile')
             }
 
@@ -81,6 +80,8 @@ const Login = () => {
                             onChange={handleChange}
                             className="w-full px-4 py-3 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500"
                         />
+                        {err.name && (<p className="text-red-400 text-md">{err.name}</p>)}
+
                     </div>
 
                     <div>
@@ -95,6 +96,8 @@ const Login = () => {
                             onChange={handleChange}
                             className="w-full px-4 py-3 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500"
                         />
+                        {err.email && (<p className="text-red-400 text-md">{err.email}</p>)}
+
                     </div>
 
                     <button
